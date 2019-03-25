@@ -5,7 +5,6 @@ import os.path
 import site
 
 sitedir = site.getsitepackages()[-1]
-#sitedir = 'lib/python3.6/site-packages'
 installdir = os.path.join(sitedir, 'ToolsNLP')
 
 with open('README.md') as f:
@@ -19,8 +18,8 @@ setup(
     version='1.0.0',
     description='Packaging common processing when analyzing related to natural language processing',
     long_description=readme,
-    author='suzuki_motoya',
-    author_email='suzuki_motoya@cyberagent.co.jp',
+    author='9en',
+    author_email='mty.0613@gmail.com',
     python_requires='>=3.4',
     install_requires=['numpy==1.15.4','neologdn','scipy==1.1.0', 'mecab-python3', 'gensim==3.6.0', 'matplotlib', 'wordcloud', 'pandas'],
     url='https://github.com/9en/ToolsNLP',

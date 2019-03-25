@@ -7,6 +7,7 @@ import subprocess
 import json
 import re
 from pathlib import Path
+import site
 
 
 class Tokenizer:
@@ -117,8 +118,9 @@ class TokenizerSentiment:
             return polarity, lemma, polarities, lemmas
 
     def _make_noun_dict(self, fname):
-        dict_path = os.path.join(Path().resolve(), "sentiment_dict/pn_noun.json")
-#        dict_path = "sentiment_dict/pn_noun.json"
+        sitedir = site.getsitepackages()[-1]
+        installdir = os.path.join(sitedir, 'ToolsNLP')
+        dict_path = installdir + "/sentiment_dict/pn_noun.json"
         if fname:
             re_and = re.compile(' &[ !]')
             with open(fname) as fd:
@@ -134,8 +136,9 @@ class TokenizerSentiment:
             return json.load(open(dict_path, 'r'))
 
     def _make_wago_dict(self, fname):
-        dict_path = os.path.join(Path().resolve(), "sentiment_dict/pn_wago.json")
-#        dict_path = "sentiment_dict/pn_wago.json"
+        sitedir = site.getsitepackages()[-1]
+        installdir = os.path.join(sitedir, 'ToolsNLP')
+        dict_path = installdir + "/sentiment_dict/pn_wago.json"
         if fname:
             with open(fname) as fd:
                 wago_dict = {}
@@ -206,7 +209,6 @@ class MecabWrapper(Tokenizer, TokenizerSentiment):
         '稲垣吾郎 、 草彅剛 、 香取慎吾 の による レギュラー番組 『 7 . 2 新しい別の窓 』 や 『 オオカミくんには騙されない 』'
     '''
     def __init__(self, dicttype='ipadic', userdict='', stopword='', noundict='', wagodict='', negation=[]):
-        print(os.getcwd())
         self._dicttype = dicttype
         self._userdict = userdict
         self._userdict_name = self._userdict.replace("csv", "dict")
