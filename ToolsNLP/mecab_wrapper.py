@@ -206,6 +206,7 @@ class MecabWrapper(Tokenizer, TokenizerSentiment):
         '稲垣吾郎 、 草彅剛 、 香取慎吾 の による レギュラー番組 『 7 . 2 新しい別の窓 』 や 『 オオカミくんには騙されない 』'
     '''
     def __init__(self, dicttype='ipadic', userdict='', stopword='', noundict='', wagodict='', negation=[]):
+        print(os.getcwd())
         self._dicttype = dicttype
         self._userdict = userdict
         self._userdict_name = self._userdict.replace("csv", "dict")

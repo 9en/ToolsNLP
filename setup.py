@@ -5,8 +5,8 @@ import os.path
 import site
 
 sitedir = site.getsitepackages()[-1]
+#sitedir = 'lib/python3.6/site-packages'
 installdir = os.path.join(sitedir, 'ToolsNLP')
-
 
 with open('README.md') as f:
     readme = f.read()
@@ -26,7 +26,7 @@ setup(
     url='https://github.com/9en/ToolsNLP',
     license=license,
     data_files=[(os.path.join(installdir, '.fonts'), ['ToolsNLP/.fonts/ipaexg.ttf']),
-        (os.path.join(installdir,'sentiment_dict'), ['ToolsNLP/sentiment_dict/pn_noun.json'])],
+        (os.path.join(installdir,'sentiment_dict'), ['ToolsNLP/sentiment_dict/pn_noun.json', 'ToolsNLP/sentiment_dict/pn_wago.json'])],
     packages=find_packages(exclude=('tests'))
 )
 
