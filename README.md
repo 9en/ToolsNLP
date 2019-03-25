@@ -19,13 +19,6 @@ make install_mecab
 make install_neologd
 ```
 
-## swig auto-install
-mecab-python3が0.996.1にアップグレードすると「swig」が必要になる。
-
-```
-make install_swig
-```
-
 ## install
 ```
 pip install git+https://github.com/9en/ToolsNLP
@@ -33,6 +26,7 @@ pip install git+https://github.com/9en/ToolsNLP
 
 # Usage
 ## Class MecabWrapper
+### 形態素解析
 ```
 >>> import ToolsNLP
 >>> text = '稲垣吾郎さん、草彅剛さん、香取慎吾さんの3人によるレギュラー番組 『7.2 新しい別の窓』や『オオカミくんには騙されない』'
@@ -42,6 +36,20 @@ pip install git+https://github.com/9en/ToolsNLP
 '稲垣吾郎 さん 、 草彅剛 さん 、 香取慎吾 さん の 3人 による レギュラー番組 『 7 . 2 新しい別の窓 』 や 『 オオカミ くん に は 騙す れる ない 』'
 >>>
 ```
+
+### ポジネガ分析
+```
+>>> import ToolsNLP
+>>> text = 'この2人のやりとりはやっぱり面白い！観てて飽きない！'
+>>> m = ToolsNLP.MecabWrapper(dicttype='neologd')
+>>> m.tokenize_sentiment(text=text)
+[1.0, 1.0]
+>>>
+>>> m.tokenize_sentiment(text=text, is_term=True)
+[{'score': 1.0, 'cnt': 1, 'polarities': [['面白い', 1]]}, {'score': 1.0, 'cnt': 1, 'polarities': [['飽きる-ない', 1]]}]
+>>>
+```
+
 
 ## Class TopicModelWrapper
 ```
