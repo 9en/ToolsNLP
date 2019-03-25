@@ -117,8 +117,8 @@ class TokenizerSentiment:
             return polarity, lemma, polarities, lemmas
 
     def _make_noun_dict(self, fname):
-#        dict_path = os.path.join(Path().resolve(), "sentiment_dict/pn_noun.json")
-        dict_path = "sentiment_dict/pn_noun.json"
+        dict_path = os.path.join(Path().resolve(), "sentiment_dict/pn_noun.json")
+#        dict_path = "sentiment_dict/pn_noun.json"
         if fname:
             re_and = re.compile(' &[ !]')
             with open(fname) as fd:
@@ -134,8 +134,8 @@ class TokenizerSentiment:
             return json.load(open(dict_path, 'r'))
 
     def _make_wago_dict(self, fname):
-#        dict_path = os.path.join(Path().resolve(), "sentiment_dict/pn_wago.json")
-        dict_path = "sentiment_dict/pn_wago.json"
+        dict_path = os.path.join(Path().resolve(), "sentiment_dict/pn_wago.json")
+#        dict_path = "sentiment_dict/pn_wago.json"
         if fname:
             with open(fname) as fd:
                 wago_dict = {}
