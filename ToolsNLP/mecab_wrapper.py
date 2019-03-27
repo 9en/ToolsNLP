@@ -66,32 +66,39 @@ class TokenizerSentiment:
             if sentence and not self.re_delimiter.match(sentence):
                 yield sentence
 
-    def __lookup_wago(self, lemma, lemmas):
+    def __lookup_wago(self, lemma, lemmas, lemmas_negation):
         if lemma in self.wago_dict:
-            return 1 if self.wago_dict[lemma].startswith('ポジ') else -1
+            polarity = 1 if self.wago_dict[lemma].startswith('ポジ') else -1
+            return polarity, lemma
         for i in range(5, 0, -1):
             wago = ' '.join(lemmas[-i:]) + ' ' + lemma
             if wago in self.wago_dict:
-                return 1 if self.wago_dict[wago].startswith('ポジ') else -1
-        return None
+                polarity = 1 if self.wago_dict[wago].startswith('ポジ') else -1
+                if lemmas_negation[-1] in wago:
+                    return None, wago
+                else:
+                    return polarity, wago
+        return None, lemma
 
     def _proc_sentiment(self, sentence, is_term):
         sentence_parsed = self._mecabObj.parse(neologdn.normalize(sentence))
         polarities = []
         lemmas = []
+        lemmas_negation = []
         # loop term parse pos
         for sentence_parsed_term in sentence_parsed.split('\n'):
             # escape EOS
             if sentence_parsed_term not in ['EOS', '']:
-                polarity, lemma, polarities, lemmas = self.__calc_sentiment_polarity(sentence_parsed_term ,is_term, lemmas, polarities)
+                polarity, lemma, polarities, lemmas, lemmas_negation = self.__calc_sentiment_polarity(sentence_parsed_term ,is_term, lemmas, polarities, lemmas_negation)
                 # append not None result
                 if polarity:
                     polarities.append([lemma,polarity])
-                    lemmas.append(lemma)
+                    lemmas_negation.append(lemma)
+                lemmas.append(lemma)
         if not polarities and is_term:
-            return {'score':0.0, 'cnt':0}
+            return None
         elif not polarities and not is_term:
-            return 0.0
+            return None
         
         score = sum([i[1] for i in polarities]) / len(polarities)
         if is_term:
@@ -99,58 +106,64 @@ class TokenizerSentiment:
         else:
             return score
 
-    def __calc_sentiment_polarity(self, sentence, is_term, lemmas, polarities):
+    def __calc_sentiment_polarity(self, sentence, is_term, lemmas, polarities, lemmas_negation):
         term = sentence.split('\t')[0]
         term_pos = sentence.split('\t')[1].split(',')
         lemma = self._term_to_base(term=term.replace(' ', '-'), term_base=term_pos[6].replace(' ', '-'), is_org=True)
-
         if lemma in self.noun_dict:
             polarity = 1 if self.noun_dict[lemma] == 'p' else -1
         else:
-            polarity = self.__lookup_wago(lemma, lemmas)
-            if not polarity and len(polarities) > 0 and lemma in self.negation:
+            polarity, lemma = self.__lookup_wago(lemma, lemmas, lemmas_negation)
+            if not polarity and len(polarities) > 0 and lemma in self.negation and lemmas_negation[-1] in lemmas[-3:]:
                 polarities[-1][1] *= -1
-                polarities[-1][0] = lemmas[-1] + '-' + lemma
+                polarities[-1][0] = lemmas_negation[-1] + '-' + lemma
         # stop word
         if lemma.lower() in self.stopword_list:
-            return None, None, None, None
+            return None, None, None, None, None
         else:
-            return polarity, lemma, polarities, lemmas
+            return polarity, lemma, polarities, lemmas, lemmas_negation
 
     def _make_noun_dict(self, fname):
         sitedir = site.getsitepackages()[-1]
         installdir = os.path.join(sitedir, 'ToolsNLP')
         dict_path = installdir + "/sentiment_dict/pn_noun.json"
+        default_dict = json.load(open(dict_path, 'r'))
         if fname:
-            re_and = re.compile(' &[ !]')
-            with open(fname) as fd:
+            with open(fname, 'r') as fd:
                 word_dict = {}
                 for line in fd:
-                    word, polarity = line.split(',')
-                    if polarity == 'e':
-                        continue
-                    word = neologdn.normalize(word)
-                    word_dict.update({word: polarity})
-            return json.load(open(dict_path, 'r')).update(word_dict)
+                    word, polarity = line.strip().split(',')
+                    if polarity == 'e' or polarity == 'ニュートラル':
+                        try:
+                            default_dict.pop(word)
+                        except:
+                            continue
+                    else:
+                        word_dict[word] = polarity
+            return {**default_dict, **word_dict}
         else:
-            return json.load(open(dict_path, 'r'))
+            return default_dict
 
     def _make_wago_dict(self, fname):
         sitedir = site.getsitepackages()[-1]
         installdir = os.path.join(sitedir, 'ToolsNLP')
         dict_path = installdir + "/sentiment_dict/pn_wago.json"
+        default_dict = json.load(open(dict_path, 'r'))
         if fname:
-            with open(fname) as fd:
-                wago_dict = {}
+            with open(fname, 'r') as fd:
+                word_dict = {}
                 for line in fd:
-                    try:
-                        word, polarity = line.rstrip().split(',')
-                    except:
-                        continue
-                    wago_dict[word] = polarity
-            return json.load(open(dict_path, 'r')).update(wago_dict)
+                    word, polarity = line.strip().split(',')
+                    if polarity == 'e' or polarity == 'ニュートラル':
+                        try:
+                            default_dict.pop(word)
+                        except:
+                            continue
+                    else:
+                        word_dict[word] = polarity
+            return {**default_dict, **word_dict}
         else:
-            return json.load(open(dict_path, 'r'))
+            return default_dict
 
 
 class MecabWrapper(Tokenizer, TokenizerSentiment):
@@ -218,7 +231,7 @@ class MecabWrapper(Tokenizer, TokenizerSentiment):
         self.stopword_list = self._stopword_list(stopword)
         self.noun_dict = self._make_noun_dict(noundict)
         self.wago_dict = self._make_wago_dict(wagodict)
-        self.re_delimiter = re.compile("[。,．!\?]")
+        self.re_delimiter = re.compile("[。,．!\?|(笑 )]")
         self.negation = ['ない', 'ず', 'ぬ'] + negation
         self._mecabObj = self.__CallMecab()
 
@@ -230,6 +243,7 @@ class MecabWrapper(Tokenizer, TokenizerSentiment):
         return self.__shell_check_output(str_cmd)
 
     def __CompileUserdict(self):
+        os.remove('userdict.dict')
         cmCompileDict = u'{0}/mecab-dict-index -d {1}/ipadic -u {2} -f utf-8 -t utf-8 {3} > /dev/null'.\
                 format(self._path_mecab_libexe, self._path_mecab_dict, self._userdict_name, self._userdict)
         try:
@@ -330,6 +344,7 @@ class MecabWrapper(Tokenizer, TokenizerSentiment):
         scores = []
         for sentence in self._split_sentence(text):
             score = self._proc_sentiment(sentence, is_term)
-            scores.append(score)
+            if score:
+                scores.append(score)
         return scores
 
