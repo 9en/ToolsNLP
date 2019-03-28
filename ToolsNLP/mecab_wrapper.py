@@ -242,7 +242,7 @@ class MecabWrapper(Tokenizer, TokenizerSentiment):
         return self.__shell_check_output(str_cmd)
 
     def __CompileUserdict(self):
-        os.remove('userdict.dict')
+        os.remove(self._userdict_name)
         cmCompileDict = u'{0}/mecab-dict-index -d {1}/ipadic -u {2} -f utf-8 -t utf-8 {3} > /dev/null'.\
                 format(self._path_mecab_libexe, self._path_mecab_dict, self._userdict_name, self._userdict)
         try:
