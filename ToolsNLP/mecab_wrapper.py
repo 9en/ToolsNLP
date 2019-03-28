@@ -74,10 +74,11 @@ class TokenizerSentiment:
             wago = ' '.join(lemmas[-i:]) + ' ' + lemma
             if wago in self.wago_dict:
                 polarity = 1 if self.wago_dict[wago].startswith('ポジ') else -1
-                if lemmas_negation[-1] in wago:
-                    return None, wago
-                else:
-                    return polarity, wago
+                if len(lemmas_negation) > 0:
+                    if lemmas_negation[-1] in wago:
+                        return None, wago
+                    else:
+                        return polarity, wago
         return None, lemma
 
     def _proc_sentiment(self, sentence, is_term):
@@ -94,7 +95,6 @@ class TokenizerSentiment:
                 if polarity:
                     polarities.append([lemma,polarity])
                     lemmas_negation.append(lemma)
-                lemmas.append(lemma)
         if not polarities and is_term:
             return None
         elif not polarities and not is_term:
@@ -118,10 +118,9 @@ class TokenizerSentiment:
                 polarities[-1][1] *= -1
                 polarities[-1][0] = lemmas_negation[-1] + '-' + lemma
         # stop word
-        if lemma.lower() in self.stopword_list:
-            return None, None, None, None, None
-        else:
-            return polarity, lemma, polarities, lemmas, lemmas_negation
+        if not lemma.lower() in self.stopword_list:
+            lemmas.append(lemma)
+        return polarity, lemma, polarities, lemmas, lemmas_negation
 
     def _make_noun_dict(self, fname):
         sitedir = site.getsitepackages()[-1]

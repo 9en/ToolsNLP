@@ -268,6 +268,7 @@ class TopicModelWrapper:
             >>> t.get_topic2term_plot()
             >>> 
         '''
+        topic_count = self._num_topics if topic_count >= self._num_topics else topic_count
         loop_count = int(np.ceil(topic_count / 3))
         for i in range(loop_count):
             plt.figure(figsize=(23,loop_count*10))
