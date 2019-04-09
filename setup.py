@@ -4,7 +4,8 @@ from setuptools import setup, find_packages
 import os.path
 import site
 
-sitedir = site.getsitepackages()[-1]
+#sitedir = site.getsitepackages()[-1]
+sitedir = ''
 installdir = os.path.join(sitedir, 'ToolsNLP')
 
 with open('README.md') as f:
