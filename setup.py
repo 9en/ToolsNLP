@@ -5,9 +5,6 @@ import os.path
 import site
 import sys
 
-prefix = sys.prefix
-sitedir = site.getsitepackages()[-1]
-installdir = os.path.join(sitedir.replace(prefix, ""), 'ToolsNLP')
 installdir = '/ToolsNLP'
 
 with open('README.md') as f:
