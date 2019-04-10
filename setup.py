@@ -3,10 +3,11 @@
 from setuptools import setup, find_packages
 import os.path
 import site
+import sys
 
-#sitedir = site.getsitepackages()[-1]
-sitedir = ''
-installdir = os.path.join(sitedir, 'ToolsNLP')
+prefix = sys.prefix
+sitedir = site.getsitepackages()[-1]
+installdir = os.path.join(sitedir.replace(prefix, ""), 'ToolsNLP')
 
 with open('README.md') as f:
     readme = f.read()
