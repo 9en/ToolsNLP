@@ -230,7 +230,7 @@ class MecabWrapper(Tokenizer, TokenizerSentiment):
         self.stopword_list = self._stopword_list(stopword)
         self.noun_dict = self._make_noun_dict(noundict)
         self.wago_dict = self._make_wago_dict(wagodict)
-        self.re_delimiter = re.compile("[。,．!\?|(笑 )]")
+        self.re_delimiter = re.compile("[。,．!\?|( )]")
         self.negation = ['ない', 'ず', 'ぬ'] + negation
         self._mecabObj = self.__CallMecab()
 
