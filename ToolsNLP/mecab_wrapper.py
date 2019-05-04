@@ -223,7 +223,7 @@ class MecabWrapper(Tokenizer, TokenizerSentiment):
     def __init__(self, dicttype='ipadic', userdict='', stopword='', noundict='', wagodict='', negation=[]):
         self._dicttype = dicttype
         self._userdict = userdict
-        self._userdict_name = os.path.join(os.path.dirname(__file__), self._userdict.replace("csv", "dict").split('/')[-1])
+        self._userdict_name = self._userdict.replace("csv", "dict").split('/')[-1]
         self._path_mecab_config = self.__shell_check_output('which mecab-config')
         self._path_mecab_dict = self.__get_mecab_path('dicdir')
         self._path_mecab_libexe = self.__get_mecab_path('libexecdir')
@@ -242,8 +242,6 @@ class MecabWrapper(Tokenizer, TokenizerSentiment):
         return self.__shell_check_output(str_cmd)
 
     def __CompileUserdict(self):
-        os.remove(os.path.join(os.path.dirname(__file__), self._userdict_name))
-#        os.remove(self._userdict_name)
         cmCompileDict = u'{0}/mecab-dict-index -d {1}/ipadic -u {2} -f utf-8 -t utf-8 {3} > /dev/null'.\
                 format(self._path_mecab_libexe, self._path_mecab_dict, self._userdict_name, self._userdict)
         try:
