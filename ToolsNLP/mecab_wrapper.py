@@ -77,8 +77,7 @@ class TokenizerSentiment:
                 if len(lemmas_negation) > 0:
                     if lemmas_negation[-1] in wago:
                         return None, wago
-                    else:
-                        return polarity, wago
+                return polarity, wago
         return None, lemma
 
     def _proc_sentiment(self, sentence, is_term):
