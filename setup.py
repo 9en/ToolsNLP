@@ -21,7 +21,7 @@ setup(
     author='9en',
     author_email='mty.0613@gmail.com',
     python_requires='>=3.4',
-    install_requires=['numpy==1.15.4','neologdn','scipy==1.1.0', 'mecab-python3', 'gensim==3.6.0', 'matplotlib', 'wordcloud', 'pandas'],
+    install_requires=['numpy','neologdn','scipy', 'mecab-python3', 'gensim', 'matplotlib', 'wordcloud', 'pandas'],
     url='https://github.com/9en/ToolsNLP',
     license=license,
     data_files=[(os.path.join(installdir, '.fonts'), ['ToolsNLP/.fonts/ipaexg.ttf']),
